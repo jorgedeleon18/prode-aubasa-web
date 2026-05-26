@@ -863,6 +863,22 @@ function cierreStr(p){const[y,m,d]=p.fecha.split('-').map(Number);const ant=new 
 
 // ══════ ESTADO ══════
 let USR=null,PRONOS={},BONUS={cam:'',fin:'',gol:''},RANK=[],GA='A',ADMA='A',DARK=localStorage.getItem('pd')==='1',MSAL=null;
+
+// ══ RESULTADOS: persistidos en localStorage para sobrevivir entre sesiones ══
+let RESULTADOS={};
+function cargarResultadosLocales(){
+  try{const r=localStorage.getItem('prode_resultados');if(r)RESULTADOS=JSON.parse(r);}catch(e){}
+  // Aplicar al fixture en memoria
+  Object.entries(RESULTADOS).forEach(([id,res])=>{
+    const p=TODOS.find(x=>x.id===id);if(!p)return;
+    p.gl=res.gl;p.gv=res.gv;
+    const gKey=id[0];if(G[gKey]){const gp=G[gKey].partidos.find(x=>x.id===id);if(gp){gp.gl=res.gl;gp.gv=res.gv;}}
+  });
+}
+function guardarResultadoLocal(id,gl,gv){
+  RESULTADOS[id]={gl:parseInt(gl),gv:parseInt(gv)};
+  try{localStorage.setItem('prode_resultados',JSON.stringify(RESULTADOS));}catch(e){}
+}
 try{MSAL=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:'https://login.microsoftonline.com/'+TENANT_ID,redirectUri:REDIRECT},cache:{cacheLocation:'sessionStorage'}});}catch(e){}
 
 // ══════ HELPERS ══════
@@ -1346,6 +1362,8 @@ async function svRes(id){
   const btn=document.getElementById('adB_'+id);btn.disabled=true;btn.textContent='Guardando...';
   const p=TODOS.find(x=>x.id===id);
   if(p){p.gl=parseInt(gL);p.gv=parseInt(gV);const pp=G[ADMA]?.partidos.find(x=>x.id===id);if(pp){pp.gl=p.gl;pp.gv=p.gv;}}
+  // Persistir en localStorage para que sobreviva entre sesiones
+  guardarResultadoLocal(id,gL,gV);
   try{await fetch(FRR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({Partido_ID:id,GL_Real:gL,GV_Real:gV})});toast('✓ Resultado guardado');}
   catch(e){toast('Guardado localmente');}
   btn.disabled=false;rAdmin(document.getElementById('mc'));
@@ -1578,6 +1596,7 @@ function rEliminatorias(mc){
 
 
 // ══════ INIT ══════
+cargarResultadosLocales();
 applyD();
 </script>
 </body>
