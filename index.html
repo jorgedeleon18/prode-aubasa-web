@@ -882,6 +882,20 @@ function cierreStr(p){const[y,m,d]=p.fecha.split('-').map(Number);const ant=new 
 // ══════ ESTADO ══════
 let USR=null,PRONOS={},BONUS={cam:'',fin:'',gol:''},RANK=[],GA='A',ADMA='A',DARK=localStorage.getItem('pd')==='1',MSAL=null;
 
+// ══ EQUIPOS ELIMINATORIAS: nombres reales de equipos, persistidos en localStorage ══
+let EQUIPOS_ELIM={};
+function cargarEquiposElimLocales(){
+  try{const r=localStorage.getItem('prode_equipos_elim');if(r)EQUIPOS_ELIM=JSON.parse(r);}catch(e){}
+  // Aplicar nombres a ERONDAS
+  Object.entries(EQUIPOS_ELIM).forEach(([id,eq])=>{
+    ERONDAS.forEach(r=>{const p=r.partidos.find(x=>x.id===id);if(p){if(eq.l)p.l=eq.l;if(eq.v)p.v=eq.v;}});
+  });
+}
+function guardarEquipoElimLocal(id,l,v){
+  EQUIPOS_ELIM[id]={l,v};
+  try{localStorage.setItem('prode_equipos_elim',JSON.stringify(EQUIPOS_ELIM));}catch(e){}
+}
+
 // ══ RESULTADOS: persistidos en localStorage para sobrevivir entre sesiones ══
 let RESULTADOS={};
 function cargarResultadosLocales(){
@@ -1417,30 +1431,89 @@ function rReglas(mc){
 }
 
 // ══════ ADMIN ══════
+let ADMA_MODO='grupo'; // 'grupo' o 'elim'
 function rAdmin(mc){
   if(!esAdm()){mc.innerHTML='<div class="empty"><div class="empty-ico">🔒</div></div>';return;}
-  const tabs=Object.keys(G).map(g=>`<div class="gtab${g===ADMA?' active':''}" onclick="aGrupo('${g}')">${g}</div>`).join('');
-  const rows=G[ADMA].partidos.map(p=>{
-    const fin=finalizado(p);
-    const bloqueado=fin&&!EDITANDO[p.id];
-    return`<div class="ar">
-      <div class="am"><div class="amt">${p.l} vs ${p.v}</div><div class="ams">${p.id} · ${fechaCorta(p.fecha)} ${p.hora} · ${p.ciudad} · ${fin?`<span style="color:var(--verde);font-weight:700">✓ ${p.gl}–${p.gv}</span>`:'Pendiente'}</div></div>
-      <div class="ag">
-        <input type="number" min="0" max="20" class="ai" id="adL_${p.id}" value="${p.gl??''}" placeholder="–" ${bloqueado?'disabled':''}>
-        <span class="a-sep">–</span>
-        <input type="number" min="0" max="20" class="ai" id="adV_${p.id}" value="${p.gv??''}" placeholder="–" ${bloqueado?'disabled':''}>
-      </div>
-      ${fin&&!EDITANDO[p.id]
-        ?`<button class="btn-as-edit" onclick="editarRes('${p.id}')">✏️ Editar</button>`
-        :`<button class="btn-as${fin?' sv':''}" id="adB_${p.id}" onclick="svRes('${p.id}')">${fin?'💾 Actualizar':'💾 Guardar'}</button>`
-      }
-    </div>`;
-  }).join('');
+  const tabsGrupos=Object.keys(G).map(g=>`<div class="gtab${ADMA_MODO==='grupo'&&g===ADMA?' active':''}" onclick="aGrupo('${g}')">${g}</div>`).join('');
+  const tabElim=`<div class="gtab${ADMA_MODO==='elim'?' active':''}" onclick="aElim()" style="background:${ADMA_MODO==='elim'?'#7c3aed':'transparent'};border-color:${ADMA_MODO==='elim'?'#7c3aed':'var(--gray-border)'}">⚔️ Elim</div>`;
+  const tabs=tabsGrupos+tabElim;
+
+  let rows='';
+  if(ADMA_MODO==='elim'){
+    rows=ERONDAS.map(ronda=>{
+      const rondaRows=ronda.partidos.map(p=>{
+        const eq=EQUIPOS_ELIM[p.id]||{};
+        const res=RESULTADOS[p.id];
+        const bloqueado=res&&!EDITANDO[p.id];
+        return`<div class="ar" style="flex-wrap:wrap;gap:6px">
+          <div class="am" style="min-width:100%">
+            <div class="amt">${p.label} · ${p.desc}</div>
+            <div class="ams">${fechaCorta(p.fecha)} ${p.hora} · ${p.ciudad}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%">
+            <input class="ai" style="width:110px;flex:1" id="adEL_${p.id}" value="${eq.l||''}" placeholder="Equipo local" ${bloqueado?'disabled':''}>
+            <span class="a-sep">vs</span>
+            <input class="ai" style="width:110px;flex:1" id="adEV_${p.id}" value="${eq.v||''}" placeholder="Equipo visitante" ${bloqueado?'disabled':''}>
+            <input type="number" min="0" max="20" class="ai" id="adL_${p.id}" value="${res?res.gl:''}" placeholder="GL" ${bloqueado?'disabled':''}>
+            <span class="a-sep">–</span>
+            <input type="number" min="0" max="20" class="ai" id="adV_${p.id}" value="${res?res.gv:''}" placeholder="GV" ${bloqueado?'disabled':''}>
+            ${res&&!EDITANDO[p.id]
+              ?`<button class="btn-as-edit" onclick="editarRes('${p.id}')">✏️ Editar</button>`
+              :`<button class="btn-as" id="adB_${p.id}" onclick="svResElim('${p.id}')">${res?'💾 Actualizar':'💾 Guardar'}</button>`
+            }
+          </div>
+        </div>`;
+      }).join('');
+      return`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:800;color:#fff;background:#7c3aed;padding:4px 10px;border-radius:5px;margin-bottom:6px;display:inline-block">${ronda.label}</div>${rondaRows}</div>`;
+    }).join('');
+  } else {
+    rows=G[ADMA].partidos.map(p=>{
+      const fin=finalizado(p);
+      const bloqueado=fin&&!EDITANDO[p.id];
+      return`<div class="ar">
+        <div class="am"><div class="amt">${p.l} vs ${p.v}</div><div class="ams">${p.id} · ${fechaCorta(p.fecha)} ${p.hora} · ${p.ciudad} · ${fin?`<span style="color:var(--verde);font-weight:700">✓ ${p.gl}–${p.gv}</span>`:'Pendiente'}</div></div>
+        <div class="ag">
+          <input type="number" min="0" max="20" class="ai" id="adL_${p.id}" value="${p.gl??''}" placeholder="–" ${bloqueado?'disabled':''}>
+          <span class="a-sep">–</span>
+          <input type="number" min="0" max="20" class="ai" id="adV_${p.id}" value="${p.gv??''}" placeholder="–" ${bloqueado?'disabled':''}>
+        </div>
+        ${fin&&!EDITANDO[p.id]
+          ?`<button class="btn-as-edit" onclick="editarRes('${p.id}')">✏️ Editar</button>`
+          :`<button class="btn-as${fin?' sv':''}" id="adB_${p.id}" onclick="svRes('${p.id}')">${fin?'💾 Actualizar':'💾 Guardar'}</button>`
+        }
+      </div>`;
+    }).join('');
+  }
+
   mc.innerHTML=`<div class="aw"><div class="ah"><div class="ah-t">Carga de resultados</div><span class="a-badge">ADMIN</span></div>
   <div class="abody"><div class="gt" style="margin-bottom:10px">${tabs}</div>${rows}
   <button class="btn-rec" onclick="recalc()">🔄 Recalcular todos los puntos</button></div></div>`;
 }
-function aGrupo(g){ADMA=g;EDITANDO={};rAdmin(document.getElementById('mc'));}
+function aGrupo(g){ADMA=g;ADMA_MODO='grupo';EDITANDO={};rAdmin(document.getElementById('mc'));}
+function aElim(){ADMA_MODO='elim';EDITANDO={};rAdmin(document.getElementById('mc'));}
+
+async function svResElim(id){
+  const l=document.getElementById('adEL_'+id)?.value.trim();
+  const v=document.getElementById('adEV_'+id)?.value.trim();
+  const gL=document.getElementById('adL_'+id)?.value;
+  const gV=document.getElementById('adV_'+id)?.value;
+  const btn=document.getElementById('adB_'+id);
+  btn.disabled=true;btn.textContent='Guardando...';
+  // Guardar equipos si se completaron
+  if(l||v){
+    guardarEquipoElimLocal(id,l,v);
+    ERONDAS.forEach(r=>{const p=r.partidos.find(x=>x.id===id);if(p){if(l)p.l=l;if(v)p.v=v;}});
+  }
+  // Guardar resultado si se completó
+  if(gL!==''&&gV!==''){
+    guardarResultadoLocal(id,gL,gV);
+    try{await fetch(FRR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({Partido_ID:id,GL_Real:gL,GV_Real:gV,Equipo_Local:l,Equipo_Visit:v})});toast('✓ Guardado');}
+    catch(e){toast('Guardado localmente');}
+  } else if(l||v){
+    toast('✓ Equipos actualizados');
+  }
+  btn.disabled=false;EDITANDO[id]=false;rAdmin(document.getElementById('mc'));
+}
 async function svRes(id){
   const gL=document.getElementById('adL_'+id)?.value;const gV=document.getElementById('adV_'+id)?.value;
   if(gL===''||gV===''){toast('Ingresá los goles','err');return;}
@@ -1684,6 +1757,7 @@ function rEliminatorias(mc){
 
 // ══════ INIT ══════
 cargarResultadosLocales();
+cargarEquiposElimLocales();
 applyD();
 </script>
 </body>
