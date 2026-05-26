@@ -181,11 +181,11 @@ body.dark .pc{background:rgba(18,28,36,.92);border-color:var(--gray-border)}
 .ph-f{color:rgba(255,255,255,.9);font-weight:700;flex-shrink:0}
 .ph-c{color:rgba(255,255,255,.55);margin-left:auto;flex-shrink:0}
 /* Equipos: local | VS | visitante */
-.mh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 14px 0;gap:8px}
-.mt{display:flex;flex-direction:column;align-items:center;gap:5px}
-.fw{width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.fw img{width:42px;height:42px;object-fit:cover;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.22);display:block}
-.mn{font-size:12px;font-weight:700;color:var(--gray-dark);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.mh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:9px 12px 0;gap:6px}
+.mt{display:flex;flex-direction:column;align-items:center;gap:3px}
+.fw{width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fw img{width:34px;height:34px;object-fit:cover;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.22);display:block}
+.mn{font-size:11px;font-weight:700;color:var(--gray-dark);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 .mc-code{display:none}
 .mc{display:flex;flex-direction:column;align-items:center;gap:4px}
 .mv{font-size:9px;font-weight:800;color:var(--gray);letter-spacing:2px}
@@ -199,7 +199,7 @@ body.dark .sb{background:#0a1520;border-color:var(--gray-border)}
 .eb-f{background:var(--aub-light);color:var(--aub-darker)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 /* Footer: cierre(izq) | inputs(centro) | guardar(der) */
-.ps{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 14px 12px;gap:8px;border-top:1px solid var(--gray-border);margin-top:12px}
+.ps{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:7px 12px 9px;gap:6px;border-top:1px solid var(--gray-border);margin-top:8px}
 .ps-left{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
 .ps-center{display:flex;align-items:center;gap:6px}
 .ps-right{display:flex;justify-content:flex-end}
@@ -297,16 +297,18 @@ body.dark .ai{background:#0d1820;border-color:var(--gray-border);color:var(--gra
 .btn-rec:hover{background:var(--amber-dark)}
 
 /* FIXTURE TABLA */
-.ft{width:100%;border-collapse:collapse;font-size:11px}
-.ft td{padding:5px 9px;border-bottom:1px solid var(--gray-border);color:var(--gray-dark)}
+.ft-grupos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+@media(max-width:900px){.ft-grupos-grid{grid-template-columns:1fr}}
+.ft{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.ft td{padding:5px 8px;border-bottom:1px solid var(--gray-border);color:var(--gray-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.dark .ft td{border-color:var(--gray-border)}
 .ft tr:last-child td{border-bottom:none}
 .ft tr.hoy td{background:rgba(0,174,195,.07)}
-.ft-fecha{font-size:9px;color:var(--gray);white-space:nowrap}
-.ft-l{font-weight:600;text-align:right}
-.ft-s{font-size:10px;color:var(--gray);text-align:center;white-space:nowrap}
-.ft-v{font-weight:600}
-.ft-c{font-size:9px;color:var(--gray);white-space:nowrap}
+.ft-fecha{font-size:9px;color:var(--gray);white-space:nowrap;width:110px}
+.ft-l{font-weight:600;text-align:right;width:30%}
+.ft-s{font-size:10px;color:var(--gray);text-align:center;white-space:nowrap;width:40px}
+.ft-v{font-weight:600;width:30%}
+.ft-c{font-size:9px;color:var(--gray);white-space:nowrap;width:90px}
 
 /* MISC */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--gray-dark);color:#fff;padding:8px 15px;border-radius:8px;font-size:11px;font-weight:600;opacity:0;transform:translateY(7px);transition:all .25s;pointer-events:none;z-index:9999;max-width:260px}
@@ -320,7 +322,7 @@ body.dark .ft td{border-color:var(--gray-border)}
 /* RESPONSIVE */
 
 /* ── BOTÓN GUARDAR GRUPO ── */
-.grupo-save-wrap{max-width:480px;margin:16px auto 0;text-align:center}
+.grupo-save-wrap{max-width:100%;margin:16px 0 0;text-align:center}
 .grupo-progress{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,.88);border-radius:9px;border:1px solid var(--gray-border);backdrop-filter:blur(4px)}
 body.dark .grupo-progress{background:rgba(18,28,36,.88);border-color:var(--gray-border)}
 .gp-label{font-size:11px;color:var(--gray);font-weight:600}
@@ -342,9 +344,13 @@ body.dark .grupo-progress{background:rgba(18,28,36,.88);border-color:var(--gray-
   background-position:right center;
 }
 /* ── GRILLA POR FECHA ── */
-.pg-fecha-wrap{margin-bottom:18px}
-.pg-fecha-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray);margin-bottom:8px;padding-left:2px}
-.pg-fecha-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pg-fecha-wrap{margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.pg-fecha-side{display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:2px}
+.pg-fecha-num{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fff;background:var(--aub);border-radius:5px;padding:3px 6px;white-space:nowrap;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);line-height:1}
+.pg-fecha-line{flex:1;width:2px;background:linear-gradient(to bottom,var(--aub),transparent);margin-top:5px;min-height:20px;border-radius:2px}
+.pg-fecha-content{flex:1;min-width:0}
+.pg-fecha-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);margin-bottom:7px;padding-left:1px}
+.pg-fecha-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:768px){.pg-fecha-grid{grid-template-columns:1fr}}
 
 /* ── BOTÓN EDITAR ADMIN ── */
@@ -1151,12 +1157,18 @@ function rPronos(mc){
     </div>`};
   });
   // Construir HTML agrupado por fecha
-  const porFecha=fechas.map(f=>{
+  const porFecha=fechas.map((f,fi)=>{
     const delDia=cardsList.filter(c=>c.fecha===f);
     const cols=delDia.length>=2?'pg-fecha-grid':'pg';
     return`<div class="pg-fecha-wrap">
-      <div class="pg-fecha-lbl">📅 ${fechaCorta(f)}</div>
-      <div class="${cols}">${delDia.map(c=>c.html).join('')}</div>
+      <div class="pg-fecha-side">
+        <div class="pg-fecha-num">Fecha ${fi+1}</div>
+        <div class="pg-fecha-line"></div>
+      </div>
+      <div class="pg-fecha-content">
+        <div class="pg-fecha-lbl">📅 ${fechaCorta(f)}</div>
+        <div class="${cols}">${delDia.map(c=>c.html).join('')}</div>
+      </div>
     </div>`;
   }).join('');
   mc.innerHTML=`<div class="gt">${tabs}</div>${porFecha}${btnGrupo}`;
@@ -1366,14 +1378,14 @@ function rFixture(mc){
         <td class="ft-c">📍${p.ciudad}</td>
       </tr>`;
     }).join('');
-    return`<div class="pw" style="margin-bottom:10px">
+    return`<div class="pw">
       <div class="pw-hdr" style="background:linear-gradient(90deg,${gc[0]},${gc[1]})">
         <div><div class="pw-t" style="color:#fff">Grupo ${g}</div><div class="pw-s" style="color:rgba(255,255,255,.55)">${data.equipos.map(fn).join(' · ')}</div></div>
       </div>
-      <table class="ft"><tbody>${rows}</tbody></table>
+      <table class="ft"><colgroup><col class="ft-fecha"><col class="ft-l"><col class="ft-s"><col class="ft-v"><col class="ft-c"></colgroup><tbody>${rows}</tbody></table>
     </div>`;
   }).join('');
-  mc.innerHTML=`<div class="rc" style="margin-bottom:11px"><p style="font-size:11px;color:var(--gray)">⚽ <strong>48 equipos · 12 grupos (A–L) · 104 partidos</strong> · Inicio: <strong>11 de junio de 2026</strong> · Horarios en ARG (UTC-3)</p></div>${grps}`;
+  mc.innerHTML=`<div class="rc" style="margin-bottom:11px"><p style="font-size:11px;color:var(--gray)">⚽ <strong>48 equipos · 12 grupos (A–L) · 104 partidos</strong> · Inicio: <strong>11 de junio de 2026</strong> · Horarios en ARG (UTC-3)</p></div><div class="ft-grupos-grid">${grps}</div>`;
 }
 
 // ══════ REGLAS ══════
