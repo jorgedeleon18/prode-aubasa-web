@@ -171,8 +171,8 @@ body.dark .gtab{background:rgba(18,28,36,.85);border-color:var(--gray-border);co
 
 /* PARTIDO */
 /* ── CARDS DE PARTIDO ── */
-.pg{display:flex;flex-direction:column;gap:16px;max-width:480px;margin:0 auto}
-.pc{background:rgba(255,255,255,.92);border-radius:9px;border:1px solid var(--gray-border);overflow:hidden;backdrop-filter:blur(4px);transition:box-shadow .15s;width:100%}
+.pg{display:flex;flex-direction:column;gap:12px}
+.pc{background:rgba(255,255,255,.92);border-radius:9px;border:1px solid var(--gray-border);overflow:hidden;backdrop-filter:blur(4px);transition:box-shadow .15s;width:100%;max-width:480px}
 body.dark .pc{background:rgba(18,28,36,.92);border-color:var(--gray-border)}
 .pc:hover{box-shadow:0 3px 14px rgba(0,0,0,.11)}
 /* Header */
@@ -350,7 +350,7 @@ body.dark .grupo-progress{background:rgba(18,28,36,.88);border-color:var(--gray-
 .pg-fecha-line{flex:1;width:2px;background:linear-gradient(to bottom,var(--aub),transparent);margin-top:5px;min-height:20px;border-radius:2px}
 .pg-fecha-content{flex:1;min-width:0}
 .pg-fecha-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);margin-bottom:7px;padding-left:1px}
-.pg-fecha-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pg-fecha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,480px));gap:12px}
 @media(max-width:768px){.pg-fecha-grid{grid-template-columns:1fr}}
 
 /* ── BOTÓN EDITAR ADMIN ── */
@@ -1161,7 +1161,7 @@ function rPronos(mc){
   // Construir HTML agrupado por fecha
   const porFecha=fechas.map((f,fi)=>{
     const delDia=cardsList.filter(c=>c.fecha===f);
-    const cols=delDia.length>=2?'pg-fecha-grid':'pg';
+    const cols='pg-fecha-grid';
     return`<div class="pg-fecha-wrap">
       <div class="pg-fecha-side">
         <div class="pg-fecha-num">Fecha ${fi+1}</div>
