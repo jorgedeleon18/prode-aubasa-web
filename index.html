@@ -999,16 +999,18 @@ async function cargarApp(){
     try{
       const res=await fetch(FP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email})});
       const d=await res.json();
-      (d.value||[]).forEach(item=>{
+      // El flow devuelve todo en d.value — separamos por Fase
+      const todos=d.value||[];
+      todos.filter(item=>!item.Fase||item.Fase==='grupos').forEach(item=>{
         PRONOS[item.Partido_ID]={
           gL:String(item.Goles_Local??''),
           gV:String(item.Goles_Visit??''),
           pts:item.Puntos_Obtenidos||0,
-          spId:item.ID||item.Id||item.id||null  // guardar ID de SharePoint para updates
+          spId:item.ID||item.Id||item.id||null
         };
       });
-      // Cargar eliminatorias
-      (d.elim||[]).forEach(item=>{
+      // Eliminatorias: d.elim si el flow lo separa, sino filtramos por Fase
+      (d.elim||todos.filter(item=>item.Fase==='eliminatoria')).forEach(item=>{
         EPRONOS[item.Partido_ID]={
           gL:String(item.Goles_Local??''),
           gV:String(item.Goles_Visit??''),
