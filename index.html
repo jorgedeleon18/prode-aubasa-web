@@ -172,7 +172,7 @@ body.dark .gtab{background:rgba(18,28,36,.85);border-color:var(--gray-border);co
 /* PARTIDO */
 /* ── CARDS DE PARTIDO ── */
 .pg{display:flex;flex-direction:column;gap:12px}
-.pc{background:rgba(255,255,255,.92);border-radius:9px;border:1px solid var(--gray-border);overflow:hidden;backdrop-filter:blur(4px);transition:box-shadow .15s;width:100%}
+.pc{background:rgba(255,255,255,.92);border-radius:9px;border:1px solid var(--gray-border);overflow:hidden;backdrop-filter:blur(4px);transition:box-shadow .15s;width:100%;min-width:0}
 body.dark .pc{background:rgba(18,28,36,.92);border-color:var(--gray-border)}
 .pc:hover{box-shadow:0 3px 14px rgba(0,0,0,.11)}
 /* Header */
@@ -352,7 +352,7 @@ body.dark .grupo-progress{background:rgba(18,28,36,.88);border-color:var(--gray-
 .pg-fecha-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);margin-bottom:7px;padding-left:1px}
 .pg-fecha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;max-width:984px}
 .pg-fecha-grid .pc{max-width:none}
-.pg-fecha-single{display:flex;flex-direction:column;gap:12px;max-width:480px;width:100%}
+.pg-fecha-single{display:flex;flex-direction:column;gap:12px}
 @media(max-width:768px){.pg-fecha-grid{grid-template-columns:1fr;max-width:480px}}
 
 /* ── BOTÓN EDITAR ADMIN ── */
@@ -1164,13 +1164,13 @@ function rPronos(mc){
   const porFecha=fechas.map((f,fi)=>{
     const delDia=cardsList.filter(c=>c.fecha===f);
     const cols=delDia.length===1?'pg-fecha-single':'pg-fecha-grid';
-    const contentStyle=delDia.length===1?'flex:1;min-width:0;max-width:480px':'flex:1;min-width:0';
-    return`<div class="pg-fecha-wrap">
+    const wrapStyle=delDia.length===1?'max-width:520px':'';
+    return`<div class="pg-fecha-wrap" style="${wrapStyle}">
       <div class="pg-fecha-side">
         <div class="pg-fecha-num">Fecha ${fi+1}</div>
         <div class="pg-fecha-line"></div>
       </div>
-      <div class="pg-fecha-content" style="${contentStyle}">
+      <div class="pg-fecha-content">
         <div class="pg-fecha-lbl">📅 ${fechaCorta(f)}</div>
         <div class="${cols}">${delDia.map(c=>c.html).join('')}</div>
       </div>
