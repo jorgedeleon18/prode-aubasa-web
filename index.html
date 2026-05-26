@@ -1163,16 +1163,16 @@ function rPronos(mc){
   // Construir HTML agrupado por fecha
   const porFecha=fechas.map((f,fi)=>{
     const delDia=cardsList.filter(c=>c.fecha===f);
-    const maxW=delDia.length===1?'max-width:480px':'max-width:984px';
     const cols=delDia.length===1?'pg-fecha-single':'pg-fecha-grid';
+    const contentStyle=delDia.length===1?'flex:1;min-width:0;max-width:480px':'flex:1;min-width:0';
     return`<div class="pg-fecha-wrap">
       <div class="pg-fecha-side">
         <div class="pg-fecha-num">Fecha ${fi+1}</div>
         <div class="pg-fecha-line"></div>
       </div>
-      <div class="pg-fecha-content">
+      <div class="pg-fecha-content" style="${contentStyle}">
         <div class="pg-fecha-lbl">📅 ${fechaCorta(f)}</div>
-        <div class="${cols}" style="${maxW}">${delDia.map(c=>c.html).join('')}</div>
+        <div class="${cols}">${delDia.map(c=>c.html).join('')}</div>
       </div>
     </div>`;
   }).join('');
