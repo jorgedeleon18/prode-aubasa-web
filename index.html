@@ -907,7 +907,7 @@ function handleLogin(){
   if(adm&&p===adm.pass){
     USR={email:uLow+'@aubasa.com.ar',nombre:adm.nombre,sector:adm.sector,inits:adm.nombre.slice(0,2).toUpperCase(),rol:'admin',nuevo:false};
     btn.disabled=false;btn.textContent='Ingresar';
-    cargarApp();
+    cargarApp();  // async, no bloqueamos el click handler
     return;
   }
 
@@ -935,7 +935,7 @@ async function verify(email,via){
   USR={email,nombre:email.split('@')[0],sector:'',inits:email.slice(0,2).toUpperCase(),rol:'user',nuevo:true};mostrarReg();
 }
 function mostrarReg(){document.getElementById('loginScreen').style.display='none';document.getElementById('regScreen').style.display='flex';}
-async function confirmarReg(){
+async function confirmarReg(){  // ya era async — cargarApp ahora también lo es
   const n=document.getElementById('rN').value.trim(),a=document.getElementById('rA').value.trim(),s=document.getElementById('rS').value;
   if(!n||!a){showErr('regErr','Ingresá nombre y apellido.');return;}
   if(!s){showErr('regErr','Seleccioná tu sector.');return;}
@@ -949,7 +949,7 @@ async function confirmarReg(){
 function logout(){USR=null;PRONOS={};RANK=[];BONUS={cam:'',fin:'',gol:''};document.getElementById('appScreen').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('btnMS').disabled=false;document.getElementById('btnMSTxt').textContent='Ingresar con cuenta Microsoft';document.getElementById('iU').value='';document.getElementById('iP').value='';}
 
 // ══════ CARGA APP ══════
-function cargarApp(){
+async function cargarApp(){
   applyD();
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
@@ -959,16 +959,39 @@ function cargarApp(){
     document.getElementById('adm-nav').style.display='block';
     document.getElementById('sbAv').style.background='#dc2626';
   }
-  updSB();initCF();V('pronosticos');
-  // Cargar pronósticos en background solo si SP está configurado
+  updSB();initCF();
+  // Mostrar spinner mientras carga
+  document.getElementById('mc').innerHTML='<div class="loading">Cargando pronósticos...</div>';
+  // Cargar pronósticos desde SharePoint (para TODOS los usuarios, incluyendo Admin)
   if(!FP.includes('TU_FLOW')){
-    fetch(FP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email})})
-      .then(r=>r.json()).then(d=>{
-        (d.value||[]).forEach(item=>{PRONOS[item.Partido_ID]={gL:item.Goles_Local??'',gV:item.Goles_Visit??'',pts:item.Puntos_Obtenidos||0};});
-        BONUS={cam:d.campeon||'',fin:d.finalista||'',gol:d.goleador_torneo||''};
-        updSB();
-      }).catch(()=>{});
+    try{
+      const res=await fetch(FP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email})});
+      const d=await res.json();
+      (d.value||[]).forEach(item=>{
+        PRONOS[item.Partido_ID]={
+          gL:String(item.Goles_Local??''),
+          gV:String(item.Goles_Visit??''),
+          pts:item.Puntos_Obtenidos||0,
+          spId:item.ID||item.Id||item.id||null  // guardar ID de SharePoint para updates
+        };
+      });
+      // Cargar eliminatorias
+      (d.elim||[]).forEach(item=>{
+        EPRONOS[item.Partido_ID]={
+          gL:String(item.Goles_Local??''),
+          gV:String(item.Goles_Visit??''),
+          alargue:item.Alargue||'no',
+          penales:item.Penales||'no',
+          penGana:item.PenGana||null,
+          pts:item.Puntos_Obtenidos||0,
+          spId:item.ID||item.Id||item.id||null
+        };
+      });
+      BONUS={cam:d.campeon||'',fin:d.finalista||'',gol:d.goleador_torneo||''};
+      updSB();
+    }catch(e){console.warn('Error cargando pronósticos:',e);}
   }
+  V('pronosticos');
 }
 
 // ══════ ROUTER ══════
@@ -1105,7 +1128,7 @@ async function guardarGrupoCompleto(){
     for(const d of datos){
       try{
         await fetch(FG,{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email:USR.email,...d,sp_id:PRONOS[d.Partido_ID]?.spId||null})});
+          body:JSON.stringify({email:USR.email,...d,Fase:'grupos',sp_id:PRONOS[d.Partido_ID]?.spId||null})});
       }catch(e){ok=false;}
     }
   }
@@ -1128,7 +1151,7 @@ async function svProno(id,ex=false){
   if(gL===''||gV===''){if(ex)toast('Ingresá los goles de ambos equipos','err');return;}
   PRONOS[id]={...PRONOS[id],gL,gV};
   const btn=document.getElementById('btn_'+id);if(btn){btn.disabled=true;btn.textContent='Guardando...';}
-  try{await fetch(FG,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email,Partido_ID:id,Goles_Local:gL,Goles_Visit:gV,sp_id:PRONOS[id]?.spId||null})});toast('✓ Pronóstico guardado');if(btn){btn.className='btn-sv saved';btn.textContent='✓ Guardado';}setTimeout(()=>{if(btn){btn.className='btn-sv';btn.textContent='💾 Guardar';btn.disabled=false;}},2000);}
+  try{await fetch(FG,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email,Partido_ID:id,Goles_Local:gL,Goles_Visit:gV,Fase:'grupos',sp_id:PRONOS[id]?.spId||null})});toast('✓ Pronóstico guardado');if(btn){btn.className='btn-sv saved';btn.textContent='✓ Guardado';}setTimeout(()=>{if(btn){btn.className='btn-sv';btn.textContent='💾 Guardar';btn.disabled=false;}},2000);}
   catch(e){toast('Guardado localmente','err');if(btn){btn.disabled=false;btn.textContent='💾 Guardar';}}
 }
 
