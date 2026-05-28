@@ -267,6 +267,33 @@ select.ib-combo:focus,input.ib-combo:focus{border-color:var(--aub);box-shadow:0 
 body.dark select.ib-combo,body.dark input.ib-combo{background-color:#0d1820;border-color:var(--gray-border);color:var(--gray-dark)}
 body.dark select.ib-combo{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300C8E0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")}
 select.ib-combo option{font-weight:500;padding:8px}
+/* ─── COMBO CUSTOM (Bonus) — 100% estilizable, tema naranja/dorado ─── */
+.cbx{position:relative;flex:1;font-family:var(--fn)}
+.cbx-trig{width:100%;height:42px;border-radius:12px;border:2px solid #e6c98a;background:#fff;padding:0 40px 0 15px;font-size:13px;font-weight:600;color:var(--gray-dark);cursor:pointer;display:flex;align-items:center;text-align:left;outline:none;transition:border-color .15s,box-shadow .15s;position:relative}
+.cbx-trig:hover{border-color:#d97706}
+.cbx-trig.open{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.16)}
+.cbx-trig.placeholder{color:var(--gray);font-weight:500}
+.cbx-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);transition:transform .2s;pointer-events:none;color:#d97706;font-size:11px}
+.cbx-trig.open .cbx-arrow{transform:translateY(-50%) rotate(180deg)}
+.cbx-pop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:2px solid #e6c98a;border-radius:13px;box-shadow:0 12px 32px rgba(120,53,15,.22);z-index:60;max-height:260px;overflow-y:auto;padding:5px;display:none;animation:cbxIn .14s ease}
+.cbx-pop.open{display:block}
+@keyframes cbxIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.cbx-search{width:calc(100% - 8px);margin:3px 4px 6px;height:34px;border-radius:9px;border:1.5px solid var(--gray-border);padding:0 12px;font-size:12px;font-family:var(--fn);color:var(--gray-dark);outline:none;background:var(--gray-light)}
+.cbx-search:focus{border-color:#d97706}
+.cbx-opt{padding:9px 13px;border-radius:9px;font-size:12.5px;font-weight:500;color:var(--gray-dark);cursor:pointer;transition:background .12s,color .12s;display:flex;align-items:center;gap:7px}
+.cbx-opt:hover,.cbx-opt.kbd{background:linear-gradient(90deg,#fef9c3,#fef3c7)}
+.cbx-opt.sel{background:linear-gradient(90deg,#ca8a04,#d97706);color:#fff;font-weight:700}
+.cbx-opt.sel:hover{background:linear-gradient(90deg,#b87d04,#c56a06)}
+.cbx-empty{padding:12px 13px;font-size:12px;color:var(--gray);text-align:center}
+.cbx-pop::-webkit-scrollbar{width:8px}
+.cbx-pop::-webkit-scrollbar-thumb{background:#e6c98a;border-radius:8px}
+body.dark .cbx-trig{background:#0d1820;border-color:#5c4a1a;color:var(--gray-dark)}
+body.dark .cbx-pop{background:#0d1820;border-color:#5c4a1a}
+body.dark .cbx-opt{color:var(--gray-dark)}
+body.dark .cbx-opt:hover,body.dark .cbx-opt.kbd{background:rgba(217,119,6,.18)}
+body.dark .cbx-search{background:#0a1520;color:var(--gray-dark)}
+/* combo custom bloqueado (después del cierre del torneo) */
+.cbx-locked{width:100%;min-height:42px;border-radius:12px;border:2px solid var(--gray-border);background:var(--gray-light);padding:11px 15px;font-size:13px;font-weight:700;color:var(--gray-dark);display:flex;align-items:center}
 
 /* REGLAS */
 .rw{display:flex;flex-direction:column;gap:11px}
@@ -1332,20 +1359,75 @@ const GOLEADORES=[
   'Otro / No está en la lista',
 ];
 
+// ─── MOTOR DEL COMBO CUSTOM (Bonus) ───
+// Estado de cada combo por su id
+const CBX_STATE={};
+// Crea el HTML de un combo custom. items=array de strings, opts={search:bool, placeholder, onPick:'nombreFn'}
+function cbxHTML(id,items,val,opts){
+  opts=opts||{};
+  CBX_STATE[id]={items,val:val||'',search:!!opts.search,onPick:opts.onPick||'',ph:opts.placeholder||'— Elegí —'};
+  const ph=opts.placeholder||'— Elegí —';
+  const txt=val||ph;
+  return`<div class="cbx" id="cbx_${id}">
+    <button type="button" class="cbx-trig${val?'':' placeholder'}" id="cbxtrig_${id}" onclick="cbxToggle('${id}')">${txt}<span class="cbx-arrow">▼</span></button>
+    <div class="cbx-pop" id="cbxpop_${id}"></div>
+  </div>`;
+}
+function cbxRenderOpts(id,filter){
+  const st=CBX_STATE[id];if(!st)return;
+  const pop=document.getElementById('cbxpop_'+id);if(!pop)return;
+  const f=(filter||'').toLowerCase().trim();
+  const list=st.items.filter(x=>x.toLowerCase().includes(f));
+  let html='';
+  if(st.search)html+=`<input class="cbx-search" id="cbxsearch_${id}" placeholder="Buscar..." oninput="cbxFilter('${id}',this.value)" onclick="event.stopPropagation()">`;
+  if(!list.length){html+=`<div class="cbx-empty">Sin resultados</div>`;}
+  else{html+=list.map(x=>`<div class="cbx-opt${x===st.val?' sel':''}" onclick="cbxPick('${id}',this.dataset.v)" data-v="${x.replace(/"/g,'&quot;')}">${x}</div>`).join('');}
+  pop.innerHTML=html;
+}
+function cbxToggle(id){
+  const pop=document.getElementById('cbxpop_'+id),trig=document.getElementById('cbxtrig_'+id);
+  if(!pop||!trig)return;
+  const isOpen=pop.classList.contains('open');
+  cbxCloseAll();
+  if(!isOpen){
+    cbxRenderOpts(id,'');
+    pop.classList.add('open');trig.classList.add('open');
+    const s=document.getElementById('cbxsearch_'+id);if(s)setTimeout(()=>s.focus(),30);
+  }
+}
+function cbxCloseAll(){
+  document.querySelectorAll('.cbx-pop.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.cbx-trig.open').forEach(t=>t.classList.remove('open'));
+}
+function cbxFilter(id,v){cbxRenderOpts(id,v);}
+function cbxPick(id,v){
+  const st=CBX_STATE[id];if(!st)return;
+  st.val=v;
+  const trig=document.getElementById('cbxtrig_'+id);
+  if(trig){trig.innerHTML=v+'<span class="cbx-arrow">▼</span>';trig.classList.remove('placeholder');}
+  cbxCloseAll();
+  if(st.onPick&&window[st.onPick])window[st.onPick](v);
+}
+function cbxGet(id){return CBX_STATE[id]?CBX_STATE[id].val:'';}
+// Cerrar combos al tocar/clickear fuera
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.cbx'))cbxCloseAll();
+});
+
 function rBonus(mc){
   const locked=Object.keys(PRONOS).length>0;
   const sel=(id,val)=>locked
-    ?`<div class="ib-combo" style="display:flex;align-items:center;background:var(--gray-light);font-weight:700;cursor:default">${val||'<span style="color:var(--gray);font-weight:500">No elegido</span>'}</div>`
-    :`<select class="ib-combo" id="${id}"><option value="">— Elegí una selección —</option>${SEL_OPT_LIST.map(s=>`<option value="${s}" ${val===s?'selected':''}>${s}</option>`).join('')}</select>`;
-  // Goleador: combo con lista de cracks + opción "Otro" que muestra un input libre
+    ?`<div class="cbx-locked">${val||'<span style="color:var(--gray);font-weight:500">No elegido</span>'}</div>`
+    :cbxHTML(id,SEL_OPT_LIST,val,{search:true,placeholder:'— Elegí una selección —'});
+  // Goleador: combo custom con lista de cracks + opción "Otro" que muestra un input libre
   const golEnLista=GOLEADORES.includes(BONUS.gol);
   const golEsOtro=BONUS.gol&&!golEnLista;
   const golSel=(id,val)=>{
-    if(locked)return`<div class="ib-combo" style="display:flex;align-items:center;background:var(--gray-light);font-weight:700;cursor:default">${val||'<span style="color:var(--gray);font-weight:500">No ingresado</span>'}</div>`;
+    if(locked)return`<div class="cbx-locked">${val||'<span style="color:var(--gray);font-weight:500">No ingresado</span>'}</div>`;
     const selVal=golEsOtro?'Otro / No está en la lista':(val||'');
-    return`<div style="flex:1;display:flex;flex-direction:column;gap:7px">
-      <select class="ib-combo" id="${id}" onchange="golCheckOtro(this.value)"><option value="">— Elegí un goleador —</option>${GOLEADORES.map(g=>`<option value="${g}" ${selVal===g?'selected':''}>${g}</option>`).join('')}</select>
-      <input class="ib-combo" id="${id}_otro" placeholder="Escribí el nombre del goleador..." value="${golEsOtro?val:''}" style="display:${golEsOtro?'block':'none'}">
+    return`<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+      ${cbxHTML(id,GOLEADORES,selVal,{search:true,placeholder:'— Elegí un goleador —',onPick:'golCheckOtro'})}
+      <input class="cbx-trig" id="${id}_otro" placeholder="Escribí el nombre del goleador..." value="${golEsOtro?val:''}" style="display:${golEsOtro?'block':'none'};cursor:text">
     </div>`;
   };
   mc.innerHTML=`<div class="bw">
@@ -1380,9 +1462,9 @@ function golCheckOtro(val){
 }
 async function svBonus(){
   // Goleador: si eligió "Otro", tomar el texto libre; si no, el valor del combo
-  let golVal=(document.getElementById('bGol')||{}).value||'';
+  let golVal=cbxGet('bGol');
   if(golVal==='Otro / No está en la lista'){golVal=(document.getElementById('bGol_otro')||{}).value?.trim()||'';}
-  BONUS={cam:(document.getElementById('bCam')||{}).value?.trim()||BONUS.cam,fin:(document.getElementById('bFin')||{}).value?.trim()||BONUS.fin,gol:golVal||BONUS.gol};
+  BONUS={cam:cbxGet('bCam')||BONUS.cam,fin:cbxGet('bFin')||BONUS.fin,gol:golVal||BONUS.gol};
   try{await fetch(FG,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email,tipo:'bonus',...BONUS})});toast('✓ Bonus guardados');}
   catch(e){toast('Guardado localmente','err');}
 }
