@@ -256,6 +256,17 @@ body.dark .blocked{color:var(--rojo);background:var(--rojo-light)}
 .ib{flex:1;height:27px;border-radius:5px;border:1.5px solid var(--gray-border);background:#fff;padding:0 9px;font-size:11px;font-family:var(--fn);color:var(--gray-dark);outline:none}
 body.dark .ib{background:#0d1820;border-color:var(--gray-border);color:var(--gray-dark)}
 .ib:focus{border-color:var(--aub)}.ib:disabled{opacity:.38;cursor:not-allowed;background:var(--gray-light)}
+/* Combos bonus: estilo redondeado y prolijo */
+select.ib-combo,input.ib-combo{flex:1;height:40px;border-radius:11px;border:2px solid var(--gray-border);background:#fff;padding:0 38px 0 14px;font-size:13px;font-weight:600;font-family:var(--fn);color:var(--gray-dark);outline:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300AEC3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center}
+input.ib-combo{padding-right:14px;background-image:none;cursor:text}
+select.ib-combo:hover,input.ib-combo:hover{border-color:var(--aub)}
+select.ib-combo:focus,input.ib-combo:focus{border-color:var(--aub);box-shadow:0 0 0 3px rgba(0,174,195,.13)}
+body.dark select.ib-combo,body.dark input.ib-combo{background-color:#0d1820;border-color:var(--gray-border);color:var(--gray-dark)}
+body.dark select.ib-combo{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300C8E0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")}
+select.ib-combo option{font-weight:500;padding:8px}
 
 /* REGLAS */
 .rw{display:flex;flex-direction:column;gap:11px}
@@ -1296,15 +1307,47 @@ function selOpts(val,dis){
     SEL_OPT_LIST.map(s=>`<option value="${s}" ${val===s?'selected':''}>${s}</option>`).join('');
 }
 const SEL_OPT_LIST=SEL_OPTS.sort();
+// Goleadores candidatos — cracks ofensivos de selecciones participantes (lista editable)
+const GOLEADORES=[
+  'Lionel Messi (Argentina)','Julián Álvarez (Argentina)','Lautaro Martínez (Argentina)',
+  'Kylian Mbappé (Francia)','Ousmane Dembélé (Francia)',
+  'Harry Kane (Inglaterra)','Bukayo Saka (Inglaterra)','Jude Bellingham (Inglaterra)',
+  'Erling Haaland (Noruega)',
+  'Vinícius Júnior (Brasil)','Rodrygo (Brasil)','Raphinha (Brasil)',
+  'Cristiano Ronaldo (Portugal)','Rafael Leão (Portugal)','Bruno Fernandes (Portugal)',
+  'Lamine Yamal (España)','Álvaro Morata (España)','Nico Williams (España)','Mikel Oyarzabal (España)',
+  'Kai Havertz (Alemania)','Florian Wirtz (Alemania)','Jamal Musiala (Alemania)',
+  'Romelu Lukaku (Bélgica)','Kevin De Bruyne (Bélgica)',
+  'Memphis Depay (Países Bajos)','Cody Gakpo (Países Bajos)',
+  'Mohamed Salah (Egipto)',
+  'Achraf Hakimi (Marruecos)','Hakim Ziyech (Marruecos)',
+  'Victor Osimhen (Nigeria)',
+  'Dušan Vlahović (Serbia)',
+  'Christian Pulisic (EE.UU.)',
+  'Alphonso Davies (Canadá)','Jonathan David (Canadá)',
+  'Hirving Lozano (México)','Santiago Giménez (México)',
+  'Luis Suárez (Uruguay)','Darwin Núñez (Uruguay)','Federico Valverde (Uruguay)',
+  'Luis Díaz (Colombia)','James Rodríguez (Colombia)',
+  'Son Heung-min (Corea del Sur)',
+  'Otro / No está en la lista',
+];
 
 function rBonus(mc){
   const locked=Object.keys(PRONOS).length>0;
   const sel=(id,val)=>locked
-    ?`<div class="ib" style="display:flex;align-items:center;padding:0 10px;background:var(--gray-light);border-radius:5px;border:1.5px solid var(--gray-border);font-size:12px;font-weight:600;color:var(--gray-dark);height:32px">${val||'<span style="color:var(--gray)">No elegido</span>'}</div>`
-    :`<select class="ib" id="${id}" style="height:32px;cursor:pointer"><option value="">— Elegí una selección —</option>${SEL_OPT_LIST.map(s=>`<option value="${s}" ${val===s?'selected':''}>${s}</option>`).join('')}</select>`;
-  const inp=(id,val)=>locked
-    ?`<div class="ib" style="display:flex;align-items:center;padding:0 10px;background:var(--gray-light);border-radius:5px;border:1.5px solid var(--gray-border);font-size:12px;font-weight:600;color:var(--gray-dark);height:32px">${val||'<span style="color:var(--gray)">No ingresado</span>'}</div>`
-    :`<input class="ib" id="${id}" placeholder="Nombre del goleador..." value="${val}" style="height:32px">`;
+    ?`<div class="ib-combo" style="display:flex;align-items:center;background:var(--gray-light);font-weight:700;cursor:default">${val||'<span style="color:var(--gray);font-weight:500">No elegido</span>'}</div>`
+    :`<select class="ib-combo" id="${id}"><option value="">— Elegí una selección —</option>${SEL_OPT_LIST.map(s=>`<option value="${s}" ${val===s?'selected':''}>${s}</option>`).join('')}</select>`;
+  // Goleador: combo con lista de cracks + opción "Otro" que muestra un input libre
+  const golEnLista=GOLEADORES.includes(BONUS.gol);
+  const golEsOtro=BONUS.gol&&!golEnLista;
+  const golSel=(id,val)=>{
+    if(locked)return`<div class="ib-combo" style="display:flex;align-items:center;background:var(--gray-light);font-weight:700;cursor:default">${val||'<span style="color:var(--gray);font-weight:500">No ingresado</span>'}</div>`;
+    const selVal=golEsOtro?'Otro / No está en la lista':(val||'');
+    return`<div style="flex:1;display:flex;flex-direction:column;gap:7px">
+      <select class="ib-combo" id="${id}" onchange="golCheckOtro(this.value)"><option value="">— Elegí un goleador —</option>${GOLEADORES.map(g=>`<option value="${g}" ${selVal===g?'selected':''}>${g}</option>`).join('')}</select>
+      <input class="ib-combo" id="${id}_otro" placeholder="Escribí el nombre del goleador..." value="${golEsOtro?val:''}" style="display:${golEsOtro?'block':'none'}">
+    </div>`;
+  };
   mc.innerHTML=`<div class="bw">
     <div class="bh"><div><div class="bh-t">🌟 Predicciones bonus</div><div class="bh-s">Se cierran al inicio del torneo · No se pueden cambiar</div></div></div>
     <div class="bb">
@@ -1321,15 +1364,25 @@ function rBonus(mc){
       <div class="bi">
         <div class="bpts">+5<span>pts</span></div>
         <div style="flex:1"><div class="blbl">⚽ Goleador del torneo</div><div class="bdesc">¿Quién marcará más goles en todo el Mundial?</div>${locked?'<span class="blocked">🔒 Cerrado</span>':''}</div>
-        ${inp('bGol',BONUS.gol)}
+        ${golSel('bGol',BONUS.gol)}
       </div>
       ${!locked?`<div style="margin-top:14px;display:flex;justify-content:flex-end"><button onclick="svBonus()" class="btn-sv">💾 Guardar predicciones bonus</button></div>`:''}
     </div>
   </div>
-  <div class="rc"><p style="font-size:11px;color:var(--gray);line-height:1.7">⚠️ Las predicciones bonus deben hacerse <strong>antes del primer partido</strong> (11 de junio de 2026). Una vez que empieza el torneo se bloquean automáticamente.<br><br>🥅 El goleador podés escribirlo libremente (ej: Messi, Mbappé).</p></div>`;
+  <div class="rc"><p style="font-size:11px;color:var(--gray);line-height:1.7">⚠️ Las predicciones bonus deben hacerse <strong>antes del primer partido</strong> (11 de junio de 2026). Una vez que empieza el torneo se bloquean automáticamente.<br><br>🥅 Si tu goleador no está en la lista, elegí "Otro" y escribilo a mano.</p></div>`;
+}
+// Muestra/oculta el input libre cuando se elige "Otro" en el combo de goleador
+function golCheckOtro(val){
+  const inp=document.getElementById('bGol_otro');
+  if(!inp)return;
+  if(val==='Otro / No está en la lista'){inp.style.display='block';inp.focus();}
+  else{inp.style.display='none';inp.value='';}
 }
 async function svBonus(){
-  BONUS={cam:(document.getElementById('bCam')||{}).value?.trim()||BONUS.cam,fin:(document.getElementById('bFin')||{}).value?.trim()||BONUS.fin,gol:(document.getElementById('bGol')||{}).value?.trim()||BONUS.gol};
+  // Goleador: si eligió "Otro", tomar el texto libre; si no, el valor del combo
+  let golVal=(document.getElementById('bGol')||{}).value||'';
+  if(golVal==='Otro / No está en la lista'){golVal=(document.getElementById('bGol_otro')||{}).value?.trim()||'';}
+  BONUS={cam:(document.getElementById('bCam')||{}).value?.trim()||BONUS.cam,fin:(document.getElementById('bFin')||{}).value?.trim()||BONUS.fin,gol:golVal||BONUS.gol};
   try{await fetch(FG,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:USR.email,tipo:'bonus',...BONUS})});toast('✓ Bonus guardados');}
   catch(e){toast('Guardado localmente','err');}
 }
