@@ -544,6 +544,41 @@ body.dark .bracket-wrap{background:rgba(18,28,36,.9)}
   .elim-grid-1{max-width:100%}
 }
 
+
+/* Banner de puntaje eliminatorias */
+.elim-score-banner{
+  margin-bottom:14px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.9);
+  border-radius:9px;
+  border:1px solid var(--gray-border);
+  backdrop-filter:blur(4px);
+}
+.elim-score-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--gray-dark);
+  margin-bottom:3px;
+}
+.elim-score-list{
+  font-size:10px;
+  color:var(--gray);
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+body.dark .elim-score-banner{
+  background:rgba(18,28,36,.86);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+body.dark .elim-score-title{
+  color:rgba(249,250,251,.86);
+}
+body.dark .elim-score-list{
+  color:rgba(156,163,175,.95);
+}
+
 </style>
 </head>
 <body>
@@ -1910,9 +1945,9 @@ function rEliminatorias(mc){
     </div>`;
   }).join('');
   mc.innerHTML=`<div class="elim-wrap">
-    <div style="margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.9);border-radius:9px;border:1px solid var(--gray-border);backdrop-filter:blur(4px)">
-      <div style="font-size:11px;font-weight:700;color:var(--gray-dark);margin-bottom:3px">⚽ Sistema de puntaje — Eliminatorias</div>
-      <div style="font-size:10px;color:var(--gray);display:flex;gap:12px;flex-wrap:wrap">
+    <div class="elim-score-banner">
+      <div class="elim-score-title">⚽ Sistema de puntaje — Eliminatorias</div>
+      <div class="elim-score-list">
         <span>🎯 Resultado exacto al 90' = <strong style="color:var(--aub)">5 pts</strong></span>
         <span>✅ Ganador+diferencia = <strong style="color:var(--verde)">3 pts</strong></span>
         <span>1️⃣ Solo ganador = <strong style="color:var(--amber)">1 pt</strong></span>
