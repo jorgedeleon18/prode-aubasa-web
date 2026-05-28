@@ -1409,7 +1409,6 @@ function cbxHTML(id,items,val,opts){
   const txt=val||ph;
   return`<div class="cbx" id="cbx_${id}">
     <button type="button" class="cbx-trig${val?'':' placeholder'}" id="cbxtrig_${id}" onclick="cbxToggle('${id}')">${txt}<span class="cbx-arrow">▼</span></button>
-    <div class="cbx-pop" id="cbxpop_${id}"></div>
   </div>`;
 }
 function cbxRenderOpts(id,filter){
@@ -1424,51 +1423,48 @@ function cbxRenderOpts(id,filter){
   pop.innerHTML=html;
 }
 function cbxToggle(id){
+  const trig=document.getElementById('cbxtrig_'+id);if(!trig)return;
+  // Si ya hay un popup abierto para este combo, cerrarlo
+  const existing=document.getElementById('cbxpop_'+id);
+  if(existing){cbxCloseAll();return;}
+  // Cerrar otros combos abiertos
+  cbxCloseAll();
+  // Crear popup nuevo y meterlo DIRECTO en body (escapa de cualquier stacking context)
+  const pop=document.createElement('div');
+  pop.id='cbxpop_'+id;
+  pop.className='cbx-pop open';
+  document.body.appendChild(pop);
+  cbxRenderOpts(id,'');
+  // Posicionar contra el trigger
+  cbxPosicionarPopup(id);
+  trig.classList.add('open');
+  const s=document.getElementById('cbxsearch_'+id);if(s)setTimeout(()=>s.focus(),30);
+}
+function cbxPosicionarPopup(id){
   const pop=document.getElementById('cbxpop_'+id),trig=document.getElementById('cbxtrig_'+id);
   if(!pop||!trig)return;
-  const isOpen=pop.classList.contains('open');
-  cbxCloseAll();
-  if(!isOpen){
-    cbxRenderOpts(id,'');
-    // Posicionar el popup como fixed con coordenadas absolutas (escapa de stacking contexts)
-    const rect=trig.getBoundingClientRect();
-    const espacioAbajo=window.innerHeight-rect.bottom;
-    pop.style.left=rect.left+'px';
-    pop.style.width=rect.width+'px';
-    if(espacioAbajo<320&&rect.top>320){
-      // Abrir hacia arriba
-      pop.style.top='auto';
-      pop.style.bottom=(window.innerHeight-rect.top+6)+'px';
-    }else{
-      // Abrir hacia abajo
-      pop.style.top=(rect.bottom+6)+'px';
-      pop.style.bottom='auto';
-    }
-    pop.classList.add('open');trig.classList.add('open');
-    const s=document.getElementById('cbxsearch_'+id);if(s)setTimeout(()=>s.focus(),30);
+  const rect=trig.getBoundingClientRect();
+  const espacioAbajo=window.innerHeight-rect.bottom;
+  pop.style.left=rect.left+'px';
+  pop.style.width=rect.width+'px';
+  if(espacioAbajo<320&&rect.top>320){
+    pop.style.top='auto';
+    pop.style.bottom=(window.innerHeight-rect.top+6)+'px';
+  }else{
+    pop.style.top=(rect.bottom+6)+'px';
+    pop.style.bottom='auto';
   }
 }
-// Reposicionar al hacer scroll o resize si hay un combo abierto
 function cbxReposicionar(){
   document.querySelectorAll('.cbx-pop.open').forEach(pop=>{
     const id=pop.id.replace('cbxpop_','');
-    const trig=document.getElementById('cbxtrig_'+id);
-    if(!trig)return;
-    const rect=trig.getBoundingClientRect();
-    const espacioAbajo=window.innerHeight-rect.bottom;
-    pop.style.left=rect.left+'px';
-    pop.style.width=rect.width+'px';
-    if(espacioAbajo<320&&rect.top>320){
-      pop.style.top='auto';pop.style.bottom=(window.innerHeight-rect.top+6)+'px';
-    }else{
-      pop.style.top=(rect.bottom+6)+'px';pop.style.bottom='auto';
-    }
+    cbxPosicionarPopup(id);
   });
 }
 window.addEventListener('scroll',cbxReposicionar,true);
 window.addEventListener('resize',cbxReposicionar);
 function cbxCloseAll(){
-  document.querySelectorAll('.cbx-pop.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.cbx-pop').forEach(p=>p.remove());
   document.querySelectorAll('.cbx-trig.open').forEach(t=>t.classList.remove('open'));
 }
 function cbxFilter(id,v){cbxRenderOpts(id,v);}
