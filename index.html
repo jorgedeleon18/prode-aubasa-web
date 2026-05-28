@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Prode Mundial 2026 — AUBASA</title>
+<title>Prode Mundial 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>
@@ -32,7 +32,7 @@ body.dark{
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:var(--fn);font-size:14px;overflow-x:hidden}
 
-/* ─── LOGIN — Identidad visual AUBASA ─── */
+/* ─── LOGIN — Identidad visual Prode ─── */
 #loginScreen{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;
@@ -62,7 +62,7 @@ html,body{height:100%;font-family:var(--fn);font-size:14px;overflow-x:hidden}
   box-shadow:0 12px 48px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.2);
   text-align:center;backdrop-filter:blur(24px);
 }
-/* Logo AUBASA estilo institucional */
+/* Logo Prode estilo institucional */
 .aub-logo-wrap{margin-bottom:18px}
 .aub-logo-svg{display:block;margin:0 auto 6px}
 .aub-logo-sub{font-size:9px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:3px;text-transform:uppercase}
@@ -368,9 +368,9 @@ body.dark .grupo-progress{background:rgba(18,28,36,.88);border-color:var(--gray-
 /* ═══ TABLET ═══ */
 @media(max-width:768px){
   :root{--sw:0px}
-  .sidebar-bg{display:none}
+  .sidebar-bg{width:0;flex-shrink:0;overflow:visible}
   .sidebar{position:fixed;left:-220px;top:0;bottom:0;width:220px;z-index:50;transition:left .26s ease;height:100vh;display:flex}
-  .sidebar.open{left:0}
+  .sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.35)}
   .sb-overlay.open{display:block}
   .hamburger{display:flex}
   .cf-wrap{left:0}
@@ -488,7 +488,7 @@ body.dark .bracket-wrap{background:rgba(18,28,36,.9)}
 </head>
 <body>
 
-<!-- ── LOGIN — Identidad AUBASA ── -->
+<!-- ── LOGIN — Identidad Prode ── -->
 <div id="loginScreen">
   <div class="as"><div></div><div></div><div></div></div>
   <div class="ao"></div>
@@ -504,15 +504,14 @@ body.dark .bracket-wrap{background:rgba(18,28,36,.9)}
     <span class="ls" style="top:88%;left:16%;animation-delay:1.5s;font-size:22px">⭐</span>
   </div>
   <div class="card-l">
-    <!-- Logo AUBASA tipográfico institucional -->
+    <!-- Logo Prode Mundial 2026 -->
     <div class="aub-logo-wrap">
-      <div style="font-family:'Encode Sans',sans-serif;font-weight:800;font-size:38px;color:#fff;letter-spacing:2px;line-height:1">AUBASA</div>
-      <div class="aub-logo-sub">AUTOPISTAS DE BUENOS AIRES S.A.</div>
+      <div style="font-family:'Encode Sans',sans-serif;font-weight:800;font-size:30px;color:#fff;letter-spacing:1px;line-height:1.05">Prode Mundial 2026</div>
+      <div class="aub-logo-sub">USA · CAN · MEX</div>
     </div>
     <span class="l-ball">⚽</span>
-    <span class="l-badge">🇦🇷 Prode Mundial 2026</span>
-    <span class="l-title">TORNEO INTERNO</span>
-    <div class="l-sub">USA · CAN · MEX · Ingresá y cargá tus pronósticos</div>
+    <span class="l-badge">🇦🇷 Torneo de pronósticos</span>
+    <div class="l-sub">Ingresá y cargá tus pronósticos del Mundial</div>
     <hr class="l-hr">
     <div id="loginError" class="err-m"></div>
     <button class="btn-ms" id="btnMS" onclick="handleMS()">
@@ -525,7 +524,7 @@ body.dark .bracket-wrap{background:rgba(18,28,36,.9)}
       <div class="lf"><label>Contraseña</label><input type="password" id="iP" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()"></div>
       <button class="btn-ing" id="btnIng" onclick="handleLogin()">Ingresar</button>
     </div>
-    <div class="l-hint">Solo cuentas @aubasa.com.ar · Admin: <strong style="color:rgba(255,255,255,.52)">Admin / Aubasa2026</strong></div>
+    <div class="l-hint">Acceso con usuario y contraseña · Admin: <strong style="color:rgba(255,255,255,.52)">Admin / Aubasa2026</strong></div>
   </div>
 </div>
 
@@ -613,7 +612,6 @@ const FG='https://default9444ead097714ed8a608802faff70d.4f.environment.api.power
 const FR='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6119875d76d64bda87d6995f1c063ebb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EaEk13ooM0VqGpzQ_k85OlbQIYyx_KmEU8R8vumw0W8';
 const FRR='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a44e8a920ada4589b7fba71fd4f67142/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yPN2U23nLsg2rvY1DqFmg7jikKJppdGFSMUWFLv5jAY';
 const FREG='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e107c7f90845cb8312f585ebeaa90a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nGeRpMWRwPkEyg7NYzG3T_0onsK0Ao-oNts7KgIUkvo';
-const FRES='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ff7a71c1d03b41ebb7dbebbf0cbdd04e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-zvRCh4ZvDPJcgN1QmQ0Q7zIW5faGtdNGtIdkiGj-jc';
 const ADMINS={'admin':{pass:'Aubasa2026',nombre:'Administrador',sector:'Sistemas',rol:'admin'},'prode':{pass:'Mundial2026',nombre:'Organizador',sector:'Sistemas',rol:'admin'}};
 
 // ══════ BANDERAS ══════
@@ -912,31 +910,6 @@ function guardarResultadoLocal(id,gl,gv){
   RESULTADOS[id]={gl:parseInt(gl),gv:parseInt(gv)};
   try{localStorage.setItem('prode_resultados',JSON.stringify(RESULTADOS));}catch(e){}
 }
-// ══ RESULTADOS DESDE SHAREPOINT: el flow automático actualiza ProdeResultados, acá los leemos ══
-function aplicarResultadoAlFixture(id,gl,gv){
-  const p=TODOS.find(x=>x.id===id);if(!p)return;
-  p.gl=gl;p.gv=gv;
-  const gKey=id[0];if(G[gKey]){const gp=G[gKey].partidos.find(x=>x.id===id);if(gp){gp.gl=gl;gp.gv=gv;}}
-}
-async function cargarResultadosSP(){
-  if(FRES.includes('TU_FLOW'))return;
-  try{
-    const res=await fetch(FRES,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
-    const arr=await res.json();
-    if(!Array.isArray(arr))return;
-    arr.forEach(item=>{
-      const id=item.Title;
-      const gl=item.GL_Real,gv=item.GV_Real;
-      if(id===undefined||id===null||id===''||gl===undefined||gl===null||gv===undefined||gv===null)return;
-      const glN=parseInt(gl),gvN=parseInt(gv);
-      if(isNaN(glN)||isNaN(gvN))return;
-      RESULTADOS[id]={gl:glN,gv:gvN};
-      aplicarResultadoAlFixture(id,glN,gvN);
-    });
-    // Respaldo offline: guardar lo último que vino de SharePoint
-    try{localStorage.setItem('prode_resultados',JSON.stringify(RESULTADOS));}catch(e){}
-  }catch(e){console.warn('Error cargando resultados de SharePoint:',e);}
-}
 try{MSAL=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:'https://login.microsoftonline.com/'+TENANT_ID,redirectUri:REDIRECT},cache:{cacheLocation:'sessionStorage'}});}catch(e){}
 
 // ══════ HELPERS ══════
@@ -1067,11 +1040,6 @@ async function cargarApp(){
       updSB();
     }catch(e){console.warn('Error cargando pronósticos:',e);}
   }
-  // Cargar resultados reales desde SharePoint (los carga el flow automático)
-  await cargarResultadosSP();
-  // Recalcular puntos de los pronósticos con los resultados reales ya aplicados
-  Object.keys(PRONOS).forEach(id=>{const p=TODOS.find(x=>x.id===id);if(!p||!finalizado(p))return;const r=calcPts(p,PRONOS[id]);if(r)PRONOS[id].pts=r.pts;});
-  updSB();
   V('pronosticos');
 }
 
