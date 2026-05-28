@@ -287,11 +287,15 @@ select.ib-combo option{font-weight:500;padding:8px}
 .cbx-empty{padding:12px 13px;font-size:12px;color:var(--gray);text-align:center}
 .cbx-pop::-webkit-scrollbar{width:8px}
 .cbx-pop::-webkit-scrollbar-thumb{background:#e6c98a;border-radius:8px}
-body.dark .cbx-trig{background:#0d1820;border-color:#5c4a1a;color:var(--gray-dark)}
-body.dark .cbx-pop{background:#0d1820;border-color:#5c4a1a}
-body.dark .cbx-opt{color:var(--gray-dark)}
-body.dark .cbx-opt:hover,body.dark .cbx-opt.kbd{background:rgba(217,119,6,.18)}
-body.dark .cbx-search{background:#0a1520;color:var(--gray-dark)}
+body.dark .cbx-trig{background:#162028;border-color:#a37b1a;color:#f1f5f9}
+body.dark .cbx-trig.placeholder{color:#8d9aa7}
+body.dark .cbx-trig:hover,body.dark .cbx-trig.open{border-color:#d97706}
+body.dark .cbx-pop{background:#1a2430;border:2px solid #a37b1a;box-shadow:0 12px 36px rgba(0,0,0,.55)}
+body.dark .cbx-opt{color:#e5edf5}
+body.dark .cbx-opt:hover,body.dark .cbx-opt.kbd{background:rgba(217,119,6,.22)}
+body.dark .cbx-opt.sel{background:linear-gradient(90deg,#ca8a04,#d97706);color:#fff}
+body.dark .cbx-search{background:#0f1a24;color:#f1f5f9;border-color:#3a4654}
+body.dark .cbx-search:focus{border-color:#d97706}
 /* combo custom bloqueado (después del cierre del torneo) */
 .cbx-locked{width:100%;min-height:42px;border-radius:12px;border:2px solid var(--gray-border);background:var(--gray-light);padding:11px 15px;font-size:13px;font-weight:700;color:var(--gray-dark);display:flex;align-items:center}
 
@@ -516,6 +520,11 @@ body.dark .bracket-btn{background:rgba(18,28,36,.85)}
 .bracket-btn:hover{border-color:var(--aub);color:var(--aub)}
 .bracket-wrap{background:rgba(255,255,255,.9);border-radius:10px;border:1px solid var(--gray-border);padding:14px;margin-bottom:16px;backdrop-filter:blur(4px);overflow-x:auto}
 body.dark .bracket-wrap{background:rgba(18,28,36,.9)}
+/* Banner Sistema de puntaje en Eliminatorias - respeta dark mode */
+.elim-pts-banner{margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.9);border-radius:9px;border:1px solid var(--gray-border);backdrop-filter:blur(4px)}
+body.dark .elim-pts-banner{background:rgba(18,28,36,.9)}
+.elim-pts-title{font-size:11px;font-weight:700;color:var(--gray-dark);margin-bottom:5px}
+.elim-pts-grid{font-size:10px;color:var(--gray);display:flex;gap:12px;flex-wrap:wrap}
 @media(max-width:768px){
   .elim-grid{grid-template-columns:1fr}
   .elim-grid-2{grid-template-columns:1fr}
@@ -1911,9 +1920,9 @@ function rEliminatorias(mc){
     </div>`;
   }).join('');
   mc.innerHTML=`<div class="elim-wrap">
-    <div style="margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.9);border-radius:9px;border:1px solid var(--gray-border);backdrop-filter:blur(4px)">
-      <div style="font-size:11px;font-weight:700;color:var(--gray-dark);margin-bottom:3px">⚽ Sistema de puntaje — Eliminatorias</div>
-      <div style="font-size:10px;color:var(--gray);display:flex;gap:12px;flex-wrap:wrap">
+    <div class="elim-pts-banner">
+      <div class="elim-pts-title">⚽ Sistema de puntaje — Eliminatorias</div>
+      <div class="elim-pts-grid">
         <span>🎯 Resultado exacto al 90' = <strong style="color:var(--aub)">5 pts</strong></span>
         <span>✅ Ganador+diferencia = <strong style="color:var(--verde)">3 pts</strong></span>
         <span>1️⃣ Solo ganador = <strong style="color:var(--amber)">1 pt</strong></span>
