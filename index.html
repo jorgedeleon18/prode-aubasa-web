@@ -613,6 +613,7 @@ const FG='https://default9444ead097714ed8a608802faff70d.4f.environment.api.power
 const FR='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/6119875d76d64bda87d6995f1c063ebb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EaEk13ooM0VqGpzQ_k85OlbQIYyx_KmEU8R8vumw0W8';
 const FRR='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a44e8a920ada4589b7fba71fd4f67142/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yPN2U23nLsg2rvY1DqFmg7jikKJppdGFSMUWFLv5jAY';
 const FREG='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e107c7f90845cb8312f585ebeaa90a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nGeRpMWRwPkEyg7NYzG3T_0onsK0Ao-oNts7KgIUkvo';
+const FRES='https://default9444ead097714ed8a608802faff70d.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ff7a71c1d03b41ebb7dbebbf0cbdd04e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-zvRCh4ZvDPJcgN1QmQ0Q7zIW5faGtdNGtIdkiGj-jc';
 const ADMINS={'admin':{pass:'Aubasa2026',nombre:'Administrador',sector:'Sistemas',rol:'admin'},'prode':{pass:'Mundial2026',nombre:'Organizador',sector:'Sistemas',rol:'admin'}};
 
 // ══════ BANDERAS ══════
@@ -911,6 +912,31 @@ function guardarResultadoLocal(id,gl,gv){
   RESULTADOS[id]={gl:parseInt(gl),gv:parseInt(gv)};
   try{localStorage.setItem('prode_resultados',JSON.stringify(RESULTADOS));}catch(e){}
 }
+// ══ RESULTADOS DESDE SHAREPOINT: el flow automático actualiza ProdeResultados, acá los leemos ══
+function aplicarResultadoAlFixture(id,gl,gv){
+  const p=TODOS.find(x=>x.id===id);if(!p)return;
+  p.gl=gl;p.gv=gv;
+  const gKey=id[0];if(G[gKey]){const gp=G[gKey].partidos.find(x=>x.id===id);if(gp){gp.gl=gl;gp.gv=gv;}}
+}
+async function cargarResultadosSP(){
+  if(FRES.includes('TU_FLOW'))return;
+  try{
+    const res=await fetch(FRES,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+    const arr=await res.json();
+    if(!Array.isArray(arr))return;
+    arr.forEach(item=>{
+      const id=item.Title;
+      const gl=item.GL_Real,gv=item.GV_Real;
+      if(id===undefined||id===null||id===''||gl===undefined||gl===null||gv===undefined||gv===null)return;
+      const glN=parseInt(gl),gvN=parseInt(gv);
+      if(isNaN(glN)||isNaN(gvN))return;
+      RESULTADOS[id]={gl:glN,gv:gvN};
+      aplicarResultadoAlFixture(id,glN,gvN);
+    });
+    // Respaldo offline: guardar lo último que vino de SharePoint
+    try{localStorage.setItem('prode_resultados',JSON.stringify(RESULTADOS));}catch(e){}
+  }catch(e){console.warn('Error cargando resultados de SharePoint:',e);}
+}
 try{MSAL=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:'https://login.microsoftonline.com/'+TENANT_ID,redirectUri:REDIRECT},cache:{cacheLocation:'sessionStorage'}});}catch(e){}
 
 // ══════ HELPERS ══════
@@ -1041,6 +1067,11 @@ async function cargarApp(){
       updSB();
     }catch(e){console.warn('Error cargando pronósticos:',e);}
   }
+  // Cargar resultados reales desde SharePoint (los carga el flow automático)
+  await cargarResultadosSP();
+  // Recalcular puntos de los pronósticos con los resultados reales ya aplicados
+  Object.keys(PRONOS).forEach(id=>{const p=TODOS.find(x=>x.id===id);if(!p||!finalizado(p))return;const r=calcPts(p,PRONOS[id]);if(r)PRONOS[id].pts=r.pts;});
+  updSB();
   V('pronosticos');
 }
 
